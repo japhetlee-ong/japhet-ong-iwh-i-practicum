@@ -22,7 +22,51 @@ const CUSTOM_OBJECTS = [
 
 // TODO: ROUTE 1 - Create a new app.get route for the homepage to call your custom object data. Pass this data along to the front-end and create a new pug template in the views folder.
 
+app.get("/", async (req, res) => {
+  try {
+    const results = [];
 
+    // Fetch each custom object
+    for (const obj of CUSTOM_OBJECTS) {
+      const response = await fetch(
+        `${HUBSPOT_BASE}/${obj.name}?properties=${obj.property}`,
+        {
+          headers: {
+            Authorization: `Bearer ${PRIVATE_APP_ACCESS}`,
+            "Content-Type": "application/json"
+          }
+        }
+      );
+
+      const data = await response.json();
+
+      results.push({
+        objectType: obj.name,
+        property: obj.property,
+        records: data.results || []
+      });
+    }
+
+    // Combine all objects into one unified list
+    const combinedData = [];
+    const maxRecords = Math.max(...allResults.map(r => r.records.length));
+
+    for (let i = 0; i < maxRecords; i++) {
+      const row = {};
+      for (const obj of allResults) {
+        const record = obj.records[i];
+        row[obj.property] = record ? record.properties[obj.property] : "N/A";
+      }
+      combinedData.push(row);
+    }
+
+    res.render("index", { data: combinedData, columns: CUSTOM_OBJECTS.map(o => o.property) });
+    
+  } catch (error) {
+    console.error("Error fetching HubSpot data:", error);
+    res.status(500).send("Error fetching HubSpot data");
+  }
+});
 
 // TODO: ROUTE 2 - Create a new app.get route for the form to create or update new custom object data. Send this data along in the next route.
 
