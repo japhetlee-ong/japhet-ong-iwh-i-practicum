@@ -1,0 +1,204 @@
+doctype html
+html
+  head
+    title HubSpot Custom Object Data
+    meta(charset="UTF-8")
+    meta(name="viewport" content="width=device-width, initial-scale=1.0")
+    style.
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 40px 20px;
+      }
+      
+      .container {
+        max-width: 1400px;
+        margin: 0 auto;
+      }
+      
+      .header {
+        background: white;
+        padding: 30px 40px;
+        border-radius: 12px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+        margin-bottom: 30px;
+      }
+      
+      h1 {
+        color: #2d3748;
+        font-size: 32px;
+        font-weight: 600;
+        text-align: center;
+        margin-bottom: 10px;
+      }
+      
+      .subtitle {
+        color: #718096;
+        text-align: center;
+        font-size: 14px;
+      }
+      
+      .header-actions {
+        margin-top: 20px;
+        text-align: center;
+      }
+      
+      .btn-update {
+        display: inline-block;
+        padding: 12px 24px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        cursor: pointer;
+      }
+      
+      .btn-update:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+      }
+      
+      .btn-update:active {
+        transform: translateY(0);
+      }
+      
+      .table-container {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+        overflow: hidden;
+      }
+      
+      .table-wrapper {
+        overflow-x: auto;
+      }
+      
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        background: white;
+      }
+      
+      thead {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      }
+      
+      th {
+        padding: 16px 20px;
+        text-align: left;
+        text-transform: capitalize;
+        color: white;
+        font-weight: 600;
+        font-size: 14px;
+        letter-spacing: 0.5px;
+        border: none;
+        white-space: nowrap;
+      }
+      
+      tbody tr {
+        border-bottom: 1px solid #e2e8f0;
+        transition: background-color 0.2s ease;
+      }
+      
+      tbody tr:hover {
+        background-color: #f7fafc;
+      }
+      
+      tbody tr:last-child {
+        border-bottom: none;
+      }
+      
+      td {
+        padding: 14px 20px;
+        text-align: left;
+        color: #4a5568;
+        font-size: 14px;
+        border: none;
+      }
+      
+      .no-data {
+        text-align: center;
+        padding: 60px 20px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+      }
+      
+      .no-data-icon {
+        font-size: 48px;
+        margin-bottom: 20px;
+        opacity: 0.3;
+      }
+      
+      .no-data p {
+        color: #718096;
+        font-size: 18px;
+        font-weight: 500;
+      }
+      
+      .record-count {
+        background: #f7fafc;
+        padding: 12px 20px;
+        border-bottom: 2px solid #e2e8f0;
+        color: #4a5568;
+        font-size: 13px;
+        font-weight: 600;
+      }
+      
+      @media (max-width: 768px) {
+        body {
+          padding: 20px 10px;
+        }
+        
+        .header {
+          padding: 20px;
+        }
+        
+        h1 {
+          font-size: 24px;
+        }
+        
+        th, td {
+          padding: 12px 15px;
+          font-size: 13px;
+        }
+      }
+
+  body
+    .container
+      .header
+        h1 HubSpot Combined Custom Objects
+        p.subtitle View and manage your custom object data
+        .header-actions
+          a.btn-update(href="/update-cobj") Add to this table
+      
+      if data.length
+        .table-container
+          .record-count
+            | Showing #{data.length} record#{data.length === 1 ? '' : 's'}
+          
+          .table-wrapper
+            table
+              thead
+                tr
+                  each col in columns
+                    th= col.replaceAll('_', ' ')
+              tbody
+                each row in data
+                  tr
+                    each col in columns
+                      td= row[col] || 'N/A'
+      else
+        .no-data
+          .no-data-icon 📊
+          p No data found

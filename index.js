@@ -12,9 +12,9 @@ const PRIVATE_APP_ACCESS = '';
 
 const HUBSPOT_BASE = "https://api.hubspot.com/crm/v3/objects/";
 
-const CUSTOM_OBJECTS = [
-    {name: "2-175822768",property:"education_attainement"},
+const CUSTOM_OBJECTS = [    
     {name: "2-175822876",property:"name"},
+    {name: "2-175822768",property:"education_attainement"},
     {name: "2-175822799",property:"occupation"},
     {name: "2-175822844",property:"years_of_service"}
 ]
@@ -49,18 +49,18 @@ app.get("/", async (req, res) => {
 
     // Combine all objects into one unified list
     const combinedData = [];
-    const maxRecords = Math.max(...allResults.map(r => r.records.length));
+    const maxRecords = Math.max(...results.map(r => r.records.length));
 
     for (let i = 0; i < maxRecords; i++) {
       const row = {};
-      for (const obj of allResults) {
+      for (const obj of results) {
         const record = obj.records[i];
         row[obj.property] = record ? record.properties[obj.property] : "N/A";
       }
       combinedData.push(row);
     }
 
-    res.render("index", { data: combinedData, columns: CUSTOM_OBJECTS.map(o => o.property) });
+    res.render("homepage", { data: combinedData, columns: CUSTOM_OBJECTS.map(o => o.property) });
     
   } catch (error) {
     console.error("Error fetching HubSpot data:", error);
@@ -70,11 +70,15 @@ app.get("/", async (req, res) => {
 
 // TODO: ROUTE 2 - Create a new app.get route for the form to create or update new custom object data. Send this data along in the next route.
 
-// * Code for Route 2 goes here
+app.get("/update-cobj", (req, res) => {
+  res.render("updates", {
+    title: "Update Custom Object Form | Integrating With HubSpot I Practicum"
+  });
+});
 
 // TODO: ROUTE 3 - Create a new app.post route for the custom objects form to create or update your custom object data. Once executed, redirect the user to the homepage.
 
-// * Code for Route 3 goes here
+
 
 /** 
 * * This is sample code to give you a reference for how you should structure your calls. 
