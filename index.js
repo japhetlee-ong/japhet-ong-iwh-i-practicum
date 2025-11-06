@@ -64,117 +64,43 @@ app.get("/update-cobj", (req, res) => {
 
 
 app.post("/submit-update", async (req, res) => {
+    const { name, educational_attainment, current_job } = req.body;
+
+  const payload = {
+    properties: {
+      name,
+      educational_attainment,
+      current_job
+    }
+  };
+
+  const endpoint = "https://api.hubspot.com/crm/v3/objects/2-175832976"; // your Applicants custom object
+  const headers = {
+    Authorization: `Bearer ${PRIVATE_APP_ACCESS}`,
+    "Content-Type": "application/json"
+  };
+
   try {
-    console.log("Form values:", req.body);
+    const response = await axios.post(endpoint, payload, { headers });
+    console.log("Applicant submitted:", response.data);
 
-    // 1️⃣ Create the contact
-    const contactResponse = await fetch(`${HUBSPOT_BASE}/contacts`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${PRIVATE_APP_ACCESS}`,
-      },
-      body: JSON.stringify({
-        properties: {
-          firstname: req.body.name,
-        },
-      }),
-    });
-
-    const contactData = await contactResponse.json();
-    console.log("Contact response:", contactData);
-
-    if (!contactResponse.ok) {
-      throw new Error(`Contact creation failed: ${JSON.stringify(contactData)}`);
-    }
-
-    const contactId = contactData.id;
-
-    // 2️⃣ Create custom objects and associate them
-    for (const obj of CUSTOM_OBJECTS) {
-      const value = req.body[obj.property];
-
-      // Create the custom object
-      const createObjRes = await fetch(`${HUBSPOT_BASE}/${obj.name}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${PRIVATE_APP_ACCESS}`,
-        },
-        body: JSON.stringify({
-          properties: {
-            [obj.property]: value,
-          },
-        }),
-      });
-
-      const objectData = await createObjRes.json();
-      console.log(`Created ${obj.name}:`, objectData);
-
-      if (!createObjRes.ok) {
-        console.error("Object creation failed:", objectData);
-        continue;
-      }
-
-      const objectId = objectData.id;
-
-      // 1. Fetch the association type ID 
-      // This is often required for custom object associations
-      const assocRes = await fetch(
-        `https://api.hubapi.com/crm/v3/associations/${obj.name}/contacts/types`,
-        {
-          headers: {
-            Authorization: `Bearer ${PRIVATE_APP_ACCESS}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      const assocData = await assocRes.json();
-      if (!assocRes.ok || !assocData.results?.length) {
-        console.warn(`No association type found for ${obj.name}:`, JSON.stringify(assocData));
-        continue;
-      }
-
-      // Use the ID property from the first result (default association type)
-      const associationTypeId = assocData.results[0].id;
-      console.log(`Association type ID for ${obj.name}:`, associationTypeId);
-
-      // 2. Associate the object with the contact
-      // The V3 URL structure requiring the association ID in the path for PUT
-const assocUrl = `${HUBSPOT_BASE}/objects/${obj.name}/${objectId}/associations/contacts/${contactId}`;
-
-      const assocPut = await fetch(assocUrl, {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${PRIVATE_APP_ACCESS}`,
-          "Content-Type": "application/json", // Reintroduce Content-Type since we have a body
-        },
-        // 2. 🎯 FIX: Pass the associationTypeId in the body
-        body: JSON.stringify({
-          associationTypeId: associationTypeId
-        }),
-      });
-
-      if (!assocPut.ok) {
-        // Log the status and body for precise debugging
-        const text = await assocPut.text();
-        console.error(`Association failed for ${obj.name} (Status ${assocPut.status}):`, text);
-      } else {
-        console.log(`Associated ${obj.name} with contact ${contactId}`);
-      }
-    }
-
+    // Render the form with a success message
     res.render("updates", {
       title: "Update Custom Object Form | Integrating With HubSpot I Practicum",
-      message: "✅ Contact and custom objects successfully created and associated!",
+      message: "Applicant submitted successfully!",      
+      redirect: true
+
     });
+
   } catch (error) {
-    console.error("❌ Error creating contact or associating objects:", error);
+    console.error("Error submitting applicant:", error.response?.data || error.message);
+
+    // Render the form with an error message
     res.render("updates", {
       title: "Update Custom Object Form | Integrating With HubSpot I Practicum",
-      message:
-        "❌ Failed to create contact and associate custom objects. Check server console for details.",
+      message: "Error submitting applicant. Please try again.",
+      redirect: false 
+
     });
   }
 });

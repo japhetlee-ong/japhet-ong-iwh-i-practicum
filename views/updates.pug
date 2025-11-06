@@ -44,7 +44,7 @@ html
       if message
         p(style="color: green; font-weight: bold; text-align: center;")= message
       
-      form(action="/submit-applicant" method="POST")
+      form(action="/submit-update" method="POST")
         .form-group
           label(for="name") Full Name
           input(type="text" id="name" name="name" placeholder="Enter full name" required)
@@ -61,3 +61,9 @@ html
       
       .link
         a(href="/") ← Return to Homepage
+
+        if redirect
+            script.
+                setTimeout(() => {
+                window.location.href = "/";
+                }, 1000); // 2000ms = 2 seconds
