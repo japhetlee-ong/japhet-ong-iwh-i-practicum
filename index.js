@@ -8,7 +8,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 // * Please DO NOT INCLUDE the private app access token in your repo. Don't do this practicum in your normal account.
-const PRIVATE_APP_ACCESS = 'pat-na2-25f4fcba-7b60-4789-8e3a-d89932240349';
+const PRIVATE_APP_ACCESS = '';
 
 const HUBSPOT_BASE = "https://api.hubspot.com/crm/v3/objects/";
 
