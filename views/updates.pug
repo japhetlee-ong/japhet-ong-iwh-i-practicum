@@ -138,6 +138,8 @@ html
     .container
       h1= title
       p.subtitle Please fill out all the required information below
+      if message
+        p(style="color: green; font-weight: bold; text-align: center;")= message
       
       form(action="/submit-update" method="POST")
         .form-group
